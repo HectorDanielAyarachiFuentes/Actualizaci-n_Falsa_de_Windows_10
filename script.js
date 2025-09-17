@@ -16,6 +16,8 @@
     let popupWindows = [];
     let isLegacyFullscreen = false;
     let updateIntervalID;
+    let originalWin10HTML;
+    let lastSelectedElement;
 
     // #endregion
 
@@ -269,6 +271,66 @@
     }
 
     /**
+     * Handles clicks within the galleries to switch the main display and enter fullscreen.
+     * @param {MouseEvent} event The click event.
+     */
+    function handleGalleryClick(event) {
+        const link = event.target.closest('a');
+        if (!link || !link.dataset.type) return;
+
+        event.preventDefault();
+
+        const mainDisplay = document.querySelector('.full-screen');
+        const type = link.dataset.type;
+
+        // Stop any ongoing update simulation
+        if (updateIntervalID) {
+            clearInterval(updateIntervalID);
+            updateIntervalID = null;
+        }
+
+        // Reset display from previous state
+        mainDisplay.innerHTML = '';
+        mainDisplay.style.backgroundImage = '';
+        mainDisplay.className = 'full-screen'; // Resets to just the base class
+
+        // Handle selection style for the clicked item
+        const currentBlock = link.closest('.color-block, .gallery-right-color');
+        if (lastSelectedElement) {
+            lastSelectedElement.classList.remove('color-block-selected', 'gallery-right-color-selected');
+        }
+        if (currentBlock) {
+            // Check if it's a side link or a main gallery block
+            const isSideLink = currentBlock.classList.contains('gallery-right-color');
+            currentBlock.classList.add(isSideLink ? 'gallery-right-color-selected' : 'color-block-selected');
+            lastSelectedElement = currentBlock;
+        }
+
+        // Apply new content/style based on data attributes
+        switch (type) {
+            case 'win10-update':
+                mainDisplay.classList.add('windows-10');
+                mainDisplay.innerHTML = originalWin10HTML;
+                startUpdateTimer(); // Restart the timer for the update screen
+                break;
+            case 'image':
+                const imageUrl = link.dataset.source;
+                mainDisplay.style.backgroundImage = `url('${imageUrl}')`;
+                mainDisplay.style.backgroundSize = 'cover';
+                mainDisplay.style.backgroundPosition = 'center';
+                mainDisplay.style.backgroundColor = '#000'; // Fallback for transparent images
+                break;
+            case 'color':
+                const colorClass = link.dataset.colorClass;
+                mainDisplay.classList.add(colorClass);
+                break;
+        }
+
+        // Enter fullscreen automatically
+        toggleFullscreen();
+    }
+
+    /**
      * Sets up all event listeners for the page.
      */
     function initializeEventListeners() {
@@ -301,6 +363,11 @@
         // Update simulation controls
         document.querySelector("#update-restart-btn").addEventListener("click", () => {
             startUpdateTimer();
+        });
+
+        // Gallery click handler for all galleries
+        document.querySelectorAll('.palette.gallery, .gallery-left').forEach(gallery => {
+            gallery.addEventListener('click', handleGalleryClick);
         });
 
         // Multi-monitor controls
@@ -738,6 +805,11 @@
     // =================================================================================
 
     docReady(function () {
+        // Store the original HTML for the Win10 update screen to restore it later
+        originalWin10HTML = document.querySelector('.full-screen').innerHTML;
+        // Keep track of the currently selected gallery item
+        lastSelectedElement = document.querySelector('.color-block-selected');
+
         // Show cookie message if not accepted
         if (!getCookie("cookies-accepted")) {
             document.querySelector(".cookies-message").style.display = "block";
