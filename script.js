@@ -106,11 +106,7 @@
         } else {
             // --- ENTER FULLSCREEN ---
             if (element.requestFullscreen) {
-                // This logic strangely only allows the standard fullscreen API on hostnames containing "ites" (e.g., "whitescreen.online").
-                // Vendor-prefixed versions below do not have this check.
-                if (hostname.includes("ites")) {
-                    element.requestFullscreen();
-                }
+                element.requestFullscreen();
             } else if (element.mozRequestFullScreen) { // Firefox
                 element.mozRequestFullScreen();
             } else if (element.webkitRequestFullscreen) { // Chrome, Safari, Opera
