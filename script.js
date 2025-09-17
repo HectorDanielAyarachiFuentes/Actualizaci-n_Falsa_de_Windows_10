@@ -264,13 +264,6 @@
     // =================================================================================
 
     /**
-     * Toggles the visibility of the language dropdown menu.
-     */
-    function langChoose() {
-        document.getElementById("lang-dropdown").classList.toggle("lang-show");
-    }
-
-    /**
      * Handles clicks within the galleries to switch the main display and enter fullscreen.
      * @param {MouseEvent} event The click event.
      */
@@ -343,20 +336,6 @@
             if (e.key === "f" || e.key === " ") {
                 toggleFullscreen();
                 e.preventDefault();
-            }
-        });
-
-        // Language dropdown
-        document.querySelector(".lang-dropbtn").addEventListener("click", langChoose);
-        window.addEventListener("click", function (e) {
-            if (!e.target.matches(".lang-dropbtn")) {
-                const dropdowns = document.getElementsByClassName("lang-dropdown-content");
-                for (let i = 0; i < dropdowns.length; i++) {
-                    const openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains("lang-show")) {
-                        openDropdown.classList.remove("lang-show");
-                    }
-                }
             }
         });
 

@@ -4,19 +4,19 @@
 
 :root {
   /* Colors */
-  --color-bg-body: #f5f4f4;
-  --color-bg-secondary: #d6d6d6;
-  --color-bg-tertiary: #f3f1f0;
-  --color-bg-card: #fff;
-  --color-text-primary: #12100c;
-  --color-accent: #ffbe5c;
+  --color-bg-body: #1a1d24;
+  --color-bg-secondary: #2c303a;
+  --color-bg-tertiary: #22252c;
+  --color-text-primary: #eef1f5;
+  --color-text-secondary: #a9b1bd;
+  --color-accent: #00aaff;
+  --color-accent-glow: rgba(0, 170, 255, 0.4);
   --color-win10-blue: #0079d7;
   --color-white: #fff;
   --color-black: #000;
   --color-red: #f00;
   --color-green: #0f0;
   --color-blue: #00f;
-
   /* Typography */
   --font-primary: Montserrat, sans-serif;
   --font-win10: "Segoe UI Variable", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -176,6 +176,7 @@ lite-youtube.lyt-activated > .lty-playbtn {
   padding: 0;
   margin: 0;
   font-family: var(--font-primary);
+  color: var(--color-text-primary);
 }
 
 body,
@@ -195,17 +196,19 @@ body {
   text-decoration: none;
 }
 
-.title-text {
-  font-size: 32px;
-  font-weight: 400;
-  text-align: left;
-}
-
 h1 {
   font-size: 48px;
   line-height: 1.2;
-  color: var(--color-text-primary);
   font-weight: 400;
+  text-shadow: 0 0 10px var(--color-accent-glow);
+}
+
+.tagline {
+  color: var(--color-text-secondary);
+  font-size: 1.1rem;
+  margin-top: -5px;
+  margin-bottom: 30px;
+  max-width: 600px;
 }
 
 .video-title {
@@ -215,16 +218,6 @@ h1 {
   font-weight: 400;
   padding-bottom: 20px;
   padding-top: 15px;
-}
-
-.site-name {
-  display: flex;
-  flex-direction: row;
-}
-
-.site-name a {
-  color: #12100c;
-  text-decoration: none;
 }
 
 .site-page {
@@ -263,7 +256,7 @@ h1 {
   padding: 20px 0;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: baseline;
   width: var(--container-width);
 }
@@ -280,7 +273,8 @@ h1 {
   margin: 20px 10px 30px 10px;
   display: inline-block;
   position: relative;
-  box-shadow: 0 8px 30px var(--color-accent);
+  border: 1px solid var(--color-accent);
+  box-shadow: 0 0 25px var(--color-accent-glow);
 }
 
 .main-color img {
@@ -317,7 +311,7 @@ h1 {
 }
 
 .color-block-selected {
-  background-color: #e0e0e0;
+  background-color: var(--color-bg-tertiary);
 }
 
 .color-block a {
@@ -327,7 +321,6 @@ h1 {
 }
 
 .gallery a {
-  color: #12100c;
   font-size: 16px;
   font-weight: 400;
 }
@@ -364,19 +357,22 @@ h1 {
   color: grey;
   padding: 10px;
   border-radius: 5px;
+  background-color: var(--color-bg-secondary);
+  transition: all 0.2s ease-in-out;
 }
 
 .gallery-right-color-selected {
-  background-color: #e0e0e0;
+  background-color: var(--color-bg-tertiary);
+  box-shadow: 0 0 10px var(--color-accent-glow);
 }
 
-.gallery-right-color-selected {
-  background-color: #e0e0e0;
+.gallery-right-color:hover {
+  transform: translateX(5px);
+  box-shadow: 0 0 10px var(--color-accent-glow);
 }
 
 .color-right-text {
   margin-left: 15px;
-  color: var(--color-text-primary);
   font-size: 16px;
   font-weight: 400;
 }
@@ -446,7 +442,6 @@ h1 {
 }
 
 .text-hint {
-  color: #12100c;
   font-weight: 500;
 }
 
@@ -493,7 +488,6 @@ lite-youtube {
 .footer a,
 p {
   text-decoration: none;
-  color: var(--color-text-primary);
   padding: 10px;
 }
 
@@ -529,48 +523,23 @@ p {
    #COMPONENT: LANGUAGE DROPDOWN
    ========================================================================== */
 
-.lang-dropbtn {
+/* Google Translate Widget Styling */
+iframe.goog-te-banner-frame {
+  display: none !important;
+}
+
+.goog-te-gadget-simple {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.goog-te-gadget-simple .goog-te-menu-value span {
+  color: var(--color-text-primary) !important;
   font-size: 20px;
-  border: none;
-  cursor: pointer;
-  color: var(--color-text-primary);
-  background-color: var(--color-bg-body);
 }
 
-.lang-dropbtn:focus {
-  outline: 0 !important;
-}
-
-.lang-dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.lang-dropdown-content {
-  display: none;
-  position: absolute;
-  left: -40px;
-  background-color: var(--color-bg-tertiary);
-  min-width: 160px;
-  overflow: auto;
-  z-index: 1;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.32);
-}
-
-.lang-dropdown-content a {
-  color: var(--color-text-primary);
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-}
-
-.lang-dropdown a:hover {
-  background-color: var(--color-bg-secondary);
-  font-weight: 500;
-}
-
-.lang-show {
-  display: block;
+body {
+  top: 0px !important; /* Fix for Google Translate adding a top margin */
 }
 
 /* ==========================================================================
@@ -578,7 +547,7 @@ p {
    ========================================================================== */
 
 .cookies-message a {
-  color: #000;
+  color: var(--color-accent);
 }
 
 .cookies-message button {
@@ -660,6 +629,10 @@ input[type="number"] {
   padding: 5px 10px;
   font-size: 16px;
   cursor: pointer;
+  background-color: var(--color-accent);
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.2s ease;
 }
 
 #open-on-all-screens {
@@ -767,8 +740,11 @@ input[type="number"] {
 
 .color-block {
   display: inline-block;
-  padding: 20px 30px 10px 30px;
+  padding: 15px;
   border-radius: 5px;
+  background-color: var(--color-bg-secondary);
+  margin: 10px;
+  transition: all 0.2s ease-in-out;
 }
 
 .color {
@@ -778,6 +754,11 @@ input[type="number"] {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.32);
   margin-bottom: 20px;
   border-radius: 5px;
+}
+
+.color-block:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px var(--color-accent-glow);
 }
 
 .color-block img {
@@ -841,10 +822,6 @@ input[type="number"] {
   width: 30px;
   height: 30px;
   cursor: pointer;
-}
-
-.footer-title {
-  font-size: 20px;
 }
 
 /* ==========================================================================
@@ -1088,13 +1065,14 @@ input[type="number"] {
 
 #popup-block-warning {
   width: 50%;
-  border: 1px solid #000;
+  border: 1px solid var(--color-accent);
   border-radius: 20px;
   padding: 20px 20px;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  background-color: var(--color-bg-body);
 }
 
 #popup-block-warning h2 {
@@ -1111,16 +1089,19 @@ input[type="number"] {
 
 #popup-block-warning img {
   display: block;
-  border: 1px solid #000;
+  border: 1px solid var(--color-text-secondary);
   margin: 10px auto 20px;
 }
 
 #popup-block-warning button {
   padding: 5px 10px;
+  background-color: var(--color-accent);
+  border: none;
+  border-radius: 5px;
 }
 
 #popup-block-warning::backdrop {
-  background-color: rgb(0, 0, 0, 0.25);
+  background-color: rgba(0, 0, 0, 0.7);
 }
 
 /* ==========================================================================
@@ -1155,8 +1136,8 @@ input[type="number"] {
     font-size: 34px;
   }
 
-  .title-text {
-    font-size: 24px;
+  .tagline {
+    font-size: 1rem;
   }
 
   .video-title {
@@ -1288,12 +1269,6 @@ input[type="number"] {
 
   .video-title {
     font-size: 18px;
-  }
-}
-
-@media screen and (max-width: 512px) {
-  .feedback {
-    display: none;
   }
 }
 
