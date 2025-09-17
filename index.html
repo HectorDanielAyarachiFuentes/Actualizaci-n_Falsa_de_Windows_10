@@ -112,22 +112,20 @@
 
                 <div class="gallery-right">
                     <div class="update-screen-settings">
-                        <div class="flex-column">
-                            <label class="update-row-title" for="update-screen-duration-value">Tiempo de
-                                actualización</label>
-                            <div class="flex-row download-size">
-                                <input id="update-screen-duration-value" type="number" min="1" value="1" />
-                                <span>minutes</span>
-                            </div>
-                            <label class="update-row-title" for="update-screen-start-value">Hora de inicio</label>
-                            <div class="flex-row download-size">
-                                <input id="update-screen-start-value" type="number" min="0" max="100" value="7" />
-                                <span>%</span>
-                            </div>
-                            <button class="download-btn" id="update-restart-btn">
-                                Reiniciar
-                            </button>
+                        <label class="update-row-title" for="update-screen-duration-value">Tiempo de
+                            actualización</label>
+                        <div class="setting-input-group">
+                            <input id="update-screen-duration-value" type="number" min="1" value="1" />
+                            <span>minutos</span>
                         </div>
+                        <label class="update-row-title" for="update-screen-start-value">Hora de inicio</label>
+                        <div class="setting-input-group">
+                            <input id="update-screen-start-value" type="number" min="0" max="100" value="7" />
+                            <span>%</span>
+                        </div>
+                        <button class="download-btn" id="update-restart-btn">
+                            Reiniciar
+                        </button>
                     </div>
                 </div>
             </div>

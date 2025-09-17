@@ -613,8 +613,13 @@ body {
    #COMPONENT: FORMS & INPUTS
    ========================================================================== */
 
-.download-size {
-  font-size: 16px;
+.setting-input-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-bg-body);
+  padding: 8px 12px;
+  border-radius: 5px;
 }
 
 #download-size-dropdown {
@@ -651,32 +656,35 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-.download-size input {
-  padding: 2px;
+.setting-input-group input {
   border: 0;
   outline: 0;
-  border-bottom: 1px solid #706f6d;
-  width: 60px;
-  font-size: 16px;
-  text-align: center;
+  width: 70%;
+  font-size: 1.1rem;
+  text-align: left;
   background-color: transparent;
 }
 
-.download-size span {
-  margin-left: 5px;
+.setting-input-group span {
+  color: var(--color-text-secondary);
+  font-size: 1rem;
 }
 
 .download-btn,
 #open-on-all-screens,
 #close-on-all-screens {
   margin-top: 30px;
-  padding: 5px 10px;
-  font-size: 16px;
+  padding: 12px;
+  font-size: 1.1rem;
   cursor: pointer;
   background-color: var(--color-accent);
   border: none;
   border-radius: 5px;
   transition: background-color 0.2s ease;
+}
+
+#update-restart-btn {
+  width: 100%;
 }
 
 #open-on-all-screens {
