@@ -812,6 +812,12 @@ input[type="number"] {
   object-fit: cover;
 }
 
+.color-swatch {
+  height: 72px;
+  width: 128px;
+  border-radius: 5px;
+}
+
 .project-card {
   width: 260px;
   padding: 0;
