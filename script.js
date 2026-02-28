@@ -16,8 +16,112 @@
     let popupWindows = [];
     let isLegacyFullscreen = false;
     let updateIntervalID;
+    let extraIntervalID;
+    let extraAnimationFrame;
     let originalWin10HTML;
     let lastSelectedElement;
+
+    const templatesHTML = {
+        'android': `
+            <div class="android-update">
+                <svg class="android-logo" viewBox="0 0 24 24" fill="#a4c639"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993.0004.5511-.4482.9997-.9993.9997zm-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997zm11.4045-6.02l1.9973-3.4592a.4158.4158 0 00-.1521-.5676.4165.4165 0 00-.568.1521l-2.0218 3.503c-1.4361-.6492-3.1147-1.04-4.8887-1.04-1.7744 0-3.453.3908-4.889.104.05-.1814-1.9213-3.3283-2.0215-3.5026a.4152.4152 0 00-.568-.1525.4149.4149 0 00-.1525.5676l1.9969 3.4592C2.6881 11.2355.2285 14.8851.2285 19.2319h23.543c0-4.3468-2.4596-7.9964-5.8885-9.9105z"/></svg>
+                <div class="android-text">Instalando actualización del sistema...</div>
+                <div class="android-loader"><div class="android-spinner"></div></div>
+            </div>
+        `,
+        'win11': `
+            <div class="win11-update">
+                <div class="win11-loader"></div>
+                <div class="win11-text">
+                    <p>Trabajando en las actualizaciones <span id="update-percentage">0</span>%</p>
+                    <p>Mantén el equipo encendido y enchufado.</p>
+                    <p>Tu PC se reiniciará varias veces.</p>
+                </div>
+            </div>
+        `,
+        'winxp': `
+            <div class="winxp-update">
+                <div class="winxp-logo">
+                    <span style="color: #ff5722; font-style: italic; font-weight: bold; font-family: sans-serif;">Microsoft</span>
+                    <span style="font-size: 3rem; font-weight: bold; font-style: italic; font-family: sans-serif;">Windows <sup style="font-size: 1.5rem">XP</sup></span>
+                </div>
+                <div class="winxp-text">Instalando Windows...</div>
+                <div class="winxp-progress">
+                    <div class="winxp-progress-bar">
+                        <div class="winxp-progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+        `,
+        'macos': `
+            <div class="macos-update">
+                <svg class="apple-logo" viewBox="0 0 170 170"><path fill="#fff" d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.92.21-9.84-1.96-14.75-6.53-3.13-2.73-7.1-7.43-11.9-14.1-5.97-8.34-10.25-17.88-12.8-28.66-2.6-10.85-3.89-21.28-3.89-31.25 0-11.96 2.64-21.73 7.9-29.33 5.37-7.79 12.33-11.83 20.84-12.11 4.58-.2 9.4 1.25 14.54 4.38 5.14 3.12 8.78 4.71 10.97 4.71 1.95 0 5.86-1.74 11.75-5.22 6.64-3.8 12.23-5.55 16.73-5.21 7.27.42 13.43 3.01 18.45 7.78 3.58 3.34 6.27 7.42 8.08 12.22-8.38 4.49-12.35 11.02-11.91 19.57.44 8.52 4.41 15.42 11.91 20.67 1.83 1.25 3.99 2.27 6.47 3.06-1.57 6.31-4.03 12.19-7.4 17.65zM124.6 15.68c-.78 3.51-2.46 6.84-5.06 10-2.6 3.15-5.87 5.76-9.82 7.82-3.95 2.05-8.08 3.48-12.38 4.29-1.29.28-2.63.42-4.01.42-1.39 0-2.63-.14-3.74-.42.92-3.89 2.89-7.55 5.92-10.99 3.02-3.44 6.81-6.28 11.37-8.5 4.55-2.22 9.5-3.66 14.86-4.3.43-3.11-.27-6.24-2.1-9.35a26.26 26.26 0 0 0-4.96-6.57 24.36 24.36 0 0 0-6.9-4.82 17.16 17.16 0 0 0-7.73-1.68c3.54-3.56 7.9-5.46 13.08-5.71 5.2-.26 10.02 1.34 14.47 4.79 4.46 3.45 7.23 8.35 8.33 14.7z"/></svg>
+                <div class="macos-progress-container">
+                    <div class="macos-progress-bar">
+                        <div class="macos-progress-fill"></div>
+                    </div>
+                </div>
+                <p class="macos-text">Calculando el tiempo restante...</p>
+            </div>
+        `,
+        'ubuntu': `
+            <div class="ubuntu-update">
+                <h1 class="ubuntu-logo">Ubuntu</h1>
+                <div class="ubuntu-dots">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+            </div>
+        `,
+        'static': `
+            <div class="static-noise"></div>
+        `,
+        'broken': `
+            <div class="broken-screen">
+                <div class="crack-1"></div>
+                <div class="crack-2"></div>
+                <div class="lcd-bleed"></div>
+            </div>
+        `,
+        'bsod': `
+            <div class="bsod-screen">
+                <div class="bsod-face">:(</div>
+                <p>Tu PC se encontró con un problema y necesita reiniciarse. Solo estamos recopilando información sobre el error, y luego lo reiniciaremos por ti.</p>
+                <p><span id="update-percentage">0</span>% completado</p>
+                <div class="bsod-qr">
+                    <div class="qr-code"></div>
+                    <div class="bsod-qr-text">
+                        <p>Para obtener más información acerca de este problema y posibles soluciones, visita https://www.windows.com/stopcode</p>
+                        <p>Si llamas a un técnico de soporte, facilítale esta información:<br/>Código de detención: CRITICAL_PROCESS_DIED</p>
+                    </div>
+                </div>
+            </div>
+        `,
+        'hacker': `
+            <div class="hacker-terminal" id="hacker-container">
+                <pre id="hacker-text"></pre>
+                <span class="cursor">_</span>
+            </div>
+        `,
+        'dvd': `
+            <div class="dvd-screensaver">
+                <div id="dvd-logo" class="dvd-logo">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm4.205 13.992c-.367.585-1.01.996-1.743 1.157-.732.16-1.503.04-2.12-.328-.614-.367-1.045-1.008-1.205-1.74-.16-.73.042-1.502.34-2.115l2.427-4.203h-2.148l-2.428 4.204c-.367.585-1.01.996-1.743 1.157-.732.16-1.503.04-2.12-.328-.616-.367-1.046-1.008-1.206-1.74-.16-.73.043-1.502.34-2.114l2.43-4.205h3.045l-2.072 3.59c.29-.028.584-.01.868.05.516.115 1.005.378 1.41.764.406.388.718.883.905 1.436.19.552.247 1.15.166 1.733-.082.582-.327 1.127-.704 1.58-.292.35-.644.64-.1.4.385.18.826.242 1.256.177.43-.064.836-.25 1.18-.544.343-.294.618-.673.79-1.107.172-.435.234-.91.18-1.38-.052-.468-.218-.918-.485-1.31-.265-.39-.623-.71-.1-.3-.385.18-.826.242-1.256.177a3.02 3.02 0 0 1-1.18-.545c-.343-.294-.618-.673-.79-1.107-.172-.435-.234-.91-.18-1.38.052-.468.216-.917.485-1.31.265-.39.623-.71 1.04-.93.418-.22.884-.33 1.355-.32.472.01.936.142 1.347.382.412.242.766.58 1.026.983.26.402.426.858.48 1.332.054.475-.01.956-.188 1.404-.177.448-.46.85-.826 1.166a3.033 3.033 0 0 1-1.23.633zm-4.35-7.533h2.147l-1.082 1.874a3.3 3.3 0 0 0-3.32-.44 3.284 3.284 0 0 0-2.254 3.02v.004h2.148l2.36-4.457z"/></svg>
+            </div>
+        </div>
+    `,
+        'clock': `
+        <div class="flip-clock-container">
+            <div id="flip-clock-time" class="flip-clock-time">12:00:00</div>
+            <div id="flip-clock-date" class="flip-clock-date">Lunes, 1 de Enero</div>
+        </div>
+    `,
+        'quote': `
+        <div class="quote-container">
+            <h2 id="quote-text">"La única forma de hacer un gran trabajo es amar lo que haces."</h2>
+            <p id="quote-author">- Steve Jobs</p>
+        </div>
+    `
+    };
 
     // #endregion
 
@@ -35,40 +139,6 @@
         } else {
             document.addEventListener("DOMContentLoaded", fn);
         }
-    }
-
-    /**
-     * Sets a cookie.
-     * @param {string} name The name of the cookie.
-     * @param {string|boolean} value The value of the cookie.
-     */
-    function setCookie(name, value) {
-        document.cookie = `${name}=${value || ""}`;
-    }
-
-    /**
-     * Gets a cookie value by name.
-     * @param {string} name The name of the cookie.
-     * @returns {string|undefined} The cookie value or undefined if not found.
-     */
-    function getCookie(name) {
-        const nameEQ = name + "=";
-        const ca = decodeURIComponent(document.cookie).split('; ');
-        for (let i = 0; i < ca.length; i++) {
-            let c = ca[i];
-            if (c.indexOf(nameEQ) === 0) {
-                return c.substring(nameEQ.length);
-            }
-        }
-        return undefined;
-    }
-
-    /**
-     * Closes the cookie consent message and sets a cookie.
-     */
-    function closeCookies() {
-        document.querySelector(".cookies-message").style.display = "none";
-        setCookie("cookies-accepted", true);
     }
 
     // #endregion
@@ -257,6 +327,108 @@
         updateIntervalID = setInterval(handleUpdateProgress, totalDurationMs / 100);
     }
 
+    // =================================================================================
+    // #region NEW TEMPLATE SCRIPTS
+    // =================================================================================
+
+    function startHacker() {
+        const textElement = document.getElementById('hacker-text');
+        if (!textElement) return;
+        const codeSnippets = [
+            "function bypass_firewall() {\n  return Array.from({length: 100}).map(x => Math.random().toString(36).substring(7));\n}",
+            "let connection = establish_ssh('admin@192.168.1.5');\nif(connection.status === 'OK') {\n  console.log('Access Granted');\n}",
+            "const data = decrypt(payload, privateKey);\nwhile(!data.isReadable) {\n  force_decode();\n}",
+            "for(let i=0; i<1000; i++) {\n  inject_sql(database_url, i, 'DROP TABLE users;');\n}",
+            "// System override initiated\nsys.modules['kernel'].freeze();",
+            "sudo rmdir / --no-preserve-root",
+            "[SYSTEM] Allocating memory block 0x00FF8A...",
+            "[SYSTEM] Compiling exploit payload...",
+            "function crack_hash(hash) {\n  let rainbow_table = load_table();\n  return rainbow_table.find(hash);\n}"
+        ];
+        let currentText = "";
+
+        extraIntervalID = setInterval(() => {
+            const snippet = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+            currentText += snippet + "\n\n";
+            if (currentText.length > 3000) currentText = currentText.substring(currentText.length - 3000); // Prevent overflow
+            textElement.innerText = currentText;
+            document.getElementById('hacker-container').scrollTop = document.getElementById('hacker-container').scrollHeight;
+        }, 300);
+    }
+
+    function startClock() {
+        const timeElement = document.getElementById('flip-clock-time');
+        const dateElement = document.getElementById('flip-clock-date');
+        if (!timeElement) return;
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+        const updateClock = () => {
+            const now = new Date();
+            timeElement.innerText = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            dateElement.innerText = now.toLocaleDateString('es-ES', options);
+        };
+        updateClock();
+        extraIntervalID = setInterval(updateClock, 1000);
+    }
+
+    function startDvd() {
+        const dvd = document.getElementById('dvd-logo');
+        if (!dvd) return;
+        let x = 0, y = 0;
+        let dirX = 1, dirY = 1;
+        const speed = 2.5;
+        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff'];
+        let colorIndex = 0;
+
+        function animate() {
+            if (!document.getElementById('dvd-logo')) return; // Exit if DOM changed
+
+            const screenW = window.innerWidth;
+            const screenH = window.innerHeight;
+            const logoW = dvd.offsetWidth;
+            const logoH = dvd.offsetHeight;
+
+            x += speed * dirX;
+            y += speed * dirY;
+
+            if (x <= 0 || x + logoW >= screenW) {
+                dirX *= -1;
+                colorIndex = (colorIndex + 1) % colors.length;
+                dvd.style.color = colors[colorIndex];
+                x = x <= 0 ? 0 : screenW - logoW;
+            }
+            if (y <= 0 || y + logoH >= screenH) {
+                dirY *= -1;
+                colorIndex = (colorIndex + 1) % colors.length;
+                dvd.style.color = colors[colorIndex];
+                y = y <= 0 ? 0 : screenH - logoH;
+            }
+
+            dvd.style.transform = `translate(${x}px, ${y}px)`;
+            extraAnimationFrame = requestAnimationFrame(animate);
+        }
+
+        // Initial setup
+        dvd.style.color = colors[Math.floor(Math.random() * colors.length)];
+        x = Math.random() * (window.innerWidth - 100);
+        y = Math.random() * (window.innerHeight - 100);
+
+        animate();
+    }
+
+    function setRandomQuote() {
+        const quotes = [
+            { text: "La única forma de hacer un gran trabajo es amar lo que haces.", author: "Steve Jobs" },
+            { text: "El éxito no es el final, el fracaso no es fatal: es el coraje para continuar lo que cuenta.", author: "Winston Churchill" },
+            { text: "No cuentes los días, haz que los días cuenten.", author: "Muhammad Ali" },
+            { text: "La mejor forma de predecir el futuro es creándolo.", author: "Peter Drucker" },
+            { text: "Cree que puedes y ya habrás recorrido la mitad del camino.", author: "Theodore Roosevelt" }
+        ];
+        const chosen = quotes[Math.floor(Math.random() * quotes.length)];
+        document.getElementById('quote-text').innerText = `"${chosen.text}"`;
+        document.getElementById('quote-author').innerText = `- ${chosen.author}`;
+    }
+
     // #endregion
 
     // =================================================================================
@@ -281,6 +453,14 @@
             clearInterval(updateIntervalID);
             updateIntervalID = null;
         }
+        if (extraIntervalID) {
+            clearInterval(extraIntervalID);
+            extraIntervalID = null;
+        }
+        if (extraAnimationFrame) {
+            cancelAnimationFrame(extraAnimationFrame);
+            extraAnimationFrame = null;
+        }
 
         // Reset display from previous state
         mainDisplay.innerHTML = '';
@@ -300,23 +480,30 @@
         }
 
         // Apply new content/style based on data attributes
-        switch (type) {
-            case 'win10-update':
-                mainDisplay.classList.add('windows-10');
-                mainDisplay.innerHTML = originalWin10HTML;
-                startUpdateTimer(); // Restart the timer for the update screen
-                break;
-            case 'image':
-                const imageUrl = link.dataset.source;
+        if (type === 'color') {
+            const colorClass = link.dataset.colorClass;
+            mainDisplay.classList.add(colorClass);
+        } else if (type === 'win10-update') {
+            mainDisplay.classList.add('windows-10');
+            mainDisplay.innerHTML = originalWin10HTML;
+            startUpdateTimer(); // Restart the timer for the update screen
+        } else if (templatesHTML[type]) {
+            mainDisplay.classList.add(type);
+            mainDisplay.innerHTML = templatesHTML[type];
+            if (['win11', 'bsod'].includes(type)) { startUpdateTimer(); }
+            if (type === 'hacker') { startHacker(); }
+            if (type === 'dvd') { startDvd(); }
+            if (type === 'clock') { startClock(); }
+            if (type === 'quote') { setRandomQuote(); }
+        } else {
+            // Fallback for an image
+            const imageUrl = link.dataset.source;
+            if (imageUrl) {
                 mainDisplay.style.backgroundImage = `url('${imageUrl}')`;
                 mainDisplay.style.backgroundSize = 'cover';
                 mainDisplay.style.backgroundPosition = 'center';
-                mainDisplay.style.backgroundColor = '#000'; // Fallback for transparent images
-                break;
-            case 'color':
-                const colorClass = link.dataset.colorClass;
-                mainDisplay.classList.add(colorClass);
-                break;
+                mainDisplay.style.backgroundColor = '#000';
+            }
         }
 
         // Enter fullscreen automatically
@@ -353,12 +540,6 @@
         if ("getScreenDetails" in window) {
             document.getElementById("open-on-all-screens").addEventListener("click", openOnAllMonitors);
             document.getElementById("close-on-all-screens").addEventListener("click", closeOnAllMonitors);
-        }
-
-        // Cookie banner
-        const cookieButton = document.querySelector(".cookies-message button");
-        if (cookieButton) {
-            cookieButton.addEventListener("click", closeCookies);
         }
 
         // Popup warning dismiss
@@ -788,11 +969,6 @@
         originalWin10HTML = document.querySelector('.full-screen').innerHTML;
         // Keep track of the currently selected gallery item
         lastSelectedElement = document.querySelector('.color-block-selected');
-
-        // Show cookie message if not accepted
-        if (!getCookie("cookies-accepted")) {
-            document.querySelector(".cookies-message").style.display = "block";
-        }
 
         // Show multi-monitor buttons if API is available
         if (window.screen.isExtended && "getScreenDetails" in window) {
